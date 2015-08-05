@@ -26,9 +26,9 @@ export default function data(ripple){
 
 function trickle(ripple){
   return function(res){
-    arguments[0] = arguments[0].body
+    var args = [arguments[0].body, arguments[1]]
     return header('content-type', 'application/data')(res)
-        && ripple.resources[res.name].body.emit('change', to.arr(arguments), not(is.in(['bubble'])))
+        && ripple.resources[res.name].body.emit('change', to.arr(args), not(is.in(['bubble'])))
   }
 }
 
