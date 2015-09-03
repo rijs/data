@@ -109,9 +109,10 @@ module.exports = function emitterify(body) {
 
   function invoke(o, k, p){
     if (!o[k]) return
-    try { o[k].apply(body, p) } catch(e) { err(e, e.stack)  }
+    var fn = o[k]
     o[k].once && (isFinite(k) ? o.splice(k, 1) : delete o[k])
-  }
+    try { fn.apply(body, p) } catch(e) { err(e, e.stack)  }
+   }
 
   function on(type, callback) {
     var ns = type.split('.')[1]
@@ -240,9 +241,9 @@ function isDef(d) {
 
 function isIn(set) {
   return function(d){
-    return  set.indexOf 
-         ? ~set.indexOf(d)
-         :  d in set
+    return !set ? false  
+         : set.indexOf ? ~set.indexOf(d)
+         : d in set
   }
 }
 },{}],11:[function(require,module,exports){
