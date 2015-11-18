@@ -1,6 +1,6 @@
 var expect = require('chai').expect
-  , core = require('rijs.core')
-  , data = require('./')
+  , core = require('rijs.core').default
+  , data = require('./').default
 
 describe('Data Type', function() {
 

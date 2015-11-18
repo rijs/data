@@ -1,31 +1,58 @@
-"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = data;
+
+var _emitterify = require('utilise/emitterify');
+
+var _emitterify2 = _interopRequireDefault(_emitterify);
+
+var _header = require('utilise/header');
+
+var _header2 = _interopRequireDefault(_header);
+
+var _extend = require('utilise/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _not = require('utilise/not');
+
+var _not2 = _interopRequireDefault(_not);
+
+var _is = require('utilise/is');
+
+var _is2 = _interopRequireDefault(_is);
+
+var _to = require('utilise/to');
+
+var _to2 = _interopRequireDefault(_to);
 
 /* istanbul ignore next */
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // -------------------------------------------
 // Adds support for data resources
 // -------------------------------------------
-module.exports = data;
-
 function data(ripple) {
-  log("creating");
-  ripple.on("change.data", trickle(ripple));
-  ripple.types["application/data"] = {
-    header: "application/data",
+  log('creating');
+  ripple.on('change.data', trickle(ripple));
+  ripple.types['application/data'] = {
+    header: 'application/data',
     check: function check(res) {
-      return is.obj(res.body) || !res.body ? true : false;
+      return _is2.default.obj(res.body) || !res.body ? true : false;
     },
     parse: function parse(res) {
       var existing = ripple.resources[res.name] || {};
       delete res.headers.listeners;
-      extend(res.headers)(existing.headers);
+      (0, _extend2.default)(res.headers)(existing.headers);
 
       !res.body && (res.body = []);
-      !res.body.on && (res.body = emitterify(res.body));
+      !res.body.on && (res.body = (0, _emitterify2.default)(res.body));
       res.body.on.change = res.headers.listeners = res.headers.listeners || [];
-      res.body.on("change.bubble", function () {
-        return ripple.emit("change", [res], not(is["in"](["data"])));
+      res.body.on('change.bubble', function () {
+        return ripple.emit('change', [res], (0, _not2.default)(_is2.default.in(['data'])));
       });
 
       return res;
@@ -38,22 +65,8 @@ function data(ripple) {
 function trickle(ripple) {
   return function (res) {
     var args = [arguments[0].body, arguments[1]];
-    return header("content-type", "application/data")(res) && ripple.resources[res.name].body.emit("change", to.arr(args), not(is["in"](["bubble"])));
+    return (0, _header2.default)('content-type', 'application/data')(res) && ripple.resources[res.name].body.emit('change', _to2.default.arr(args), (0, _not2.default)(_is2.default.in(['bubble'])));
   };
 }
 
-var emitterify = _interopRequire(require("utilise/emitterify"));
-
-var header = _interopRequire(require("utilise/header"));
-
-var extend = _interopRequire(require("utilise/extend"));
-
-var not = _interopRequire(require("utilise/not"));
-
-var log = _interopRequire(require("utilise/log"));
-
-var is = _interopRequire(require("utilise/is"));
-
-var to = _interopRequire(require("utilise/to"));
-
-log = log("[ri/types/data]");
+var log = require('utilise/log')('[ri/types/data]');

@@ -36,7 +36,6 @@ import emitterify from 'utilise/emitterify'
 import header from 'utilise/header'
 import extend from 'utilise/extend'
 import not from 'utilise/not'
-import log from 'utilise/log'
 import is from 'utilise/is'
 import to from 'utilise/to'
-log = log('[ri/types/data]')
+var log = require('utilise/log')('[ri/types/data]')
