@@ -1,6 +1,8 @@
 var expect = require('chai').expect
   , core = require('rijs.core').default
   , data = require('./').default
+  , core = require('rijs.core').default
+  , to = require('utilise/to')
 
 describe('Data Type', function() {
 
@@ -24,26 +26,51 @@ describe('Data Type', function() {
 
   it('should emit local change events', function(){
     var ripple = data(core())
-      , fn = function(r){ result = r }
+      , fn = function(){ result = to.arr(arguments) }
       , result 
 
     ripple('foo').on('change', fn)
+
     ripple('foo').emit('change')
-    expect(result).to.eql([])
+    expect(result).to.eql([-1])
+
+    ripple('foo').emit('change', { change: 'yep' })
+    expect(result).to.eql([{ change: 'yep' }])
   })
 
   it('should emit global change events', function(){
     var ripple = data(core())
-      , fn = function(r){ result = r }
+      , fn = function(){ result = to.arr(arguments) }
       , result 
 
     ripple('foo')
     ripple.on('change', fn)
+
     ripple('foo').emit('change')
-    
-    expect(result.name).to.be.ok
-    expect(result.body).to.be.ok
-    expect(result.headers).to.be.ok
+    expect(result).to.eql(['foo', -1])
+
+    ripple('foo').emit('change', { change: 'yep' })
+    expect(result).to.eql(['foo', { change: 'yep' }])
+  })
+
+  it('should proxy global change events to local', function(){
+    var ripple = data(core())
+      , fn = function(){ result = to.arr(arguments) }
+      , result 
+
+    ripple('foo').on('change', fn)
+
+    ripple.emit('change', 'foo')
+    expect(result).to.eql([-1])
+
+    ripple.emit('change', ['foo'])
+    expect(result).to.eql([-1])
+
+    ripple.emit('change', ['foo', false])
+    expect(result).to.eql([-1])
+
+    ripple.emit('change', ['foo', { change: 'yep' }])
+    expect(result).to.eql([{ change: 'yep' }])
   })
 
   it('should not duplicate listeners', function(){

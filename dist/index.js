@@ -49,10 +49,10 @@ function data(ripple) {
       (0, _extend2.default)(res.headers)(existing.headers);
 
       !res.body && (res.body = []);
-      !res.body.on && (res.body = (0, _emitterify2.default)(res.body));
+      !res.body.on && (res.body = (0, _emitterify2.default)(res.body, -1));
       res.body.on.change = res.headers.listeners = res.headers.listeners || [];
-      res.body.on('change.bubble', function () {
-        return ripple.emit('change', [res], (0, _not2.default)(_is2.default.in(['data'])));
+      res.body.on('change.bubble', function (change) {
+        return ripple.emit('change', [res.name, change], (0, _not2.default)(_is2.default.in(['data'])));
       });
 
       return res;
@@ -62,11 +62,10 @@ function data(ripple) {
   return ripple;
 }
 
-function trickle(ripple) {
-  return function (res) {
-    var args = [arguments[0].body, arguments[1]];
-    return (0, _header2.default)('content-type', 'application/data')(res) && ripple.resources[res.name].body.emit('change', _to2.default.arr(args), (0, _not2.default)(_is2.default.in(['bubble'])));
+var trickle = function trickle(ripple) {
+  return function (name, change) {
+    return (0, _header2.default)('content-type', 'application/data')(ripple.resources[name]) && ripple.resources[name].body.emit('change', [change || -1], (0, _not2.default)(_is2.default.in(['bubble'])));
   };
-}
+};
 
 var log = require('utilise/log')('[ri/types/data]');
