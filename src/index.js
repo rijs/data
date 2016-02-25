@@ -14,8 +14,10 @@ export default function data(ripple){
 
       !res.body    && (res.body = [])
       !res.body.on && (res.body = emitterify(res.body, -1))
+
        res.body.on.change = res.headers.listeners = res.headers.listeners || []
        res.body.on('change.bubble', change => ripple.emit('change', [res.name, change], not(is.in(['data']))))
+       res.body.on('log', change => res.body.emit('change', change))
 
       return res
     }
