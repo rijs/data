@@ -1,6 +1,9 @@
-var expect = require('chai').expect
-  , data = require('./').default
+var versioned = require('versioned').default
+  , expect = require('chai').expect
   , core = require('rijs.core').default
+  , update = require('utilise/update')
+  , data = require('./').default
+  , key = require('utilise/key')
   , to = require('utilise/to')
 
 describe('Data Type', function() {
@@ -116,6 +119,36 @@ describe('Data Type', function() {
     expect(ripple('foo').on('foo')[0]).to.eql(Function)
     expect(ripple('foo').on('foo').length).to.eql(1)
     expect(ripple('foo').on('foo.bar')).to.eql(Boolean)
+  })
+
+  it('should not lose log and update it on overwrite', function(){
+    var ripple = data(core())
+      
+    ripple('foo', versioned(['foo']))
+    update(0, 'bar')(ripple('foo'))
+    
+    // should not need to explicity reinit version
+    ripple('foo', ['baz'])
+    update(0, 'boo')(ripple('foo'))
+    
+    // should work if new object versioned
+    ripple('foo', versioned(['wat']))
+
+    expect(ripple('foo').log.length).to.eql(5)
+    expect(ripple('foo').log[0].value.toJS()).to.eql(['foo'])
+    expect(ripple('foo').log[0].diff).to.eql(undefined)
+    
+    expect(ripple('foo').log[1].value.toJS()).to.eql(['bar'])
+    expect(ripple('foo').log[1].diff).to.eql({ key: '0', value: 'bar', type: 'update' })
+    
+    expect(ripple('foo').log[2].value.toJS()).to.eql(['baz'])
+    expect(ripple('foo').log[2].diff).to.eql(undefined)
+
+    expect(ripple('foo').log[3].value.toJS()).to.eql(['boo'])
+    expect(ripple('foo').log[3].diff).to.eql({ key: '0', value: 'boo', type: 'update' })
+
+    expect(ripple('foo').log[4].value.toJS()).to.eql(['wat'])
+    expect(ripple('foo').log[4].diff).to.eql(undefined)
   })
 
 })

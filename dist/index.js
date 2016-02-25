@@ -25,6 +25,10 @@ var _not = require('utilise/not');
 
 var _not2 = _interopRequireDefault(_not);
 
+var _key = require('utilise/key');
+
+var _key2 = _interopRequireDefault(_key);
+
 var _is = require('utilise/is');
 
 var _is2 = _interopRequireDefault(_is);
@@ -32,8 +36,6 @@ var _is2 = _interopRequireDefault(_is);
 var _to = require('utilise/to');
 
 var _to2 = _interopRequireDefault(_to);
-
-require('utilise');
 
 /* istanbul ignore next */
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -57,8 +59,8 @@ function data(ripple) {
 
       (0, _extend2.default)(res.headers)(existing.headers);
       (0, _overwrite2.default)(res.body.on)(existing.body && existing.body.on || {});
-      console.log('ex', keys(existing.body && existing.body.on || {}));
-      console.log('res', keys(res.body.on));
+      if (logged(existing)) res.body.log = existing.body.log.reset(res.body);
+
       res.body.on('change.bubble', function (change) {
         return ripple.emit('change', [res.name, change], (0, _not2.default)(_is2.default.in(['data'])));
       });
@@ -79,4 +81,5 @@ var trickle = function trickle(ripple) {
   };
 };
 
-var log = require('utilise/log')('[ri/types/data]');
+var log = require('utilise/log')('[ri/types/data]'),
+    logged = (0, _key2.default)('body.log');

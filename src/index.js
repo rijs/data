@@ -15,6 +15,7 @@ export default function data(ripple){
 
       extend(res.headers)(existing.headers)
       overwrite(res.body.on)(existing.body && existing.body.on || {})
+      if (logged(existing)) res.body.log = existing.body.log.reset(res.body)
 
       res.body.on('change.bubble', change => ripple.emit('change', [res.name, change], not(is.in(['data']))))
       res.body.on('log', change => res.body.emit('change', change))
@@ -37,6 +38,8 @@ import overwrite from 'utilise/overwrite'
 import header from 'utilise/header'
 import extend from 'utilise/extend'
 import not from 'utilise/not'
+import key from 'utilise/key'
 import is from 'utilise/is'
 import to from 'utilise/to'
 const log = require('utilise/log')('[ri/types/data]')
+    , logged = key('body.log')
