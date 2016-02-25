@@ -1,5 +1,4 @@
 var expect = require('chai').expect
-  , core = require('rijs.core').default
   , data = require('./').default
   , core = require('rijs.core').default
   , to = require('utilise/to')
@@ -99,5 +98,24 @@ describe('Data Type', function() {
     expect(ripple.resources.name.headers.foo).to.be.eql('baz')
   })
 
+  it('should not lose all listeners', function(){
+    var ripple = data(core())
+      
+    ripple('foo', ['foo'])
+      .on('change', String)
+      .on('change.foo', Date)
+      .on('foo', Function)
+      .on('foo.bar', Boolean)
+
+    ripple('foo', ['bar'])
+
+    expect(ripple('foo').on('change')[0]).to.eql(String)
+    expect(ripple('foo').on('change').length).to.eql(1)
+    expect(ripple('foo').on('change.foo')).to.eql(Date)
+    
+    expect(ripple('foo').on('foo')[0]).to.eql(Function)
+    expect(ripple('foo').on('foo').length).to.eql(1)
+    expect(ripple('foo').on('foo.bar')).to.eql(Boolean)
+  })
 
 })

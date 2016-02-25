@@ -9,6 +9,10 @@ var _emitterify = require('utilise/emitterify');
 
 var _emitterify2 = _interopRequireDefault(_emitterify);
 
+var _overwrite = require('utilise/overwrite');
+
+var _overwrite2 = _interopRequireDefault(_overwrite);
+
 var _header = require('utilise/header');
 
 var _header2 = _interopRequireDefault(_header);
@@ -29,6 +33,8 @@ var _to = require('utilise/to');
 
 var _to2 = _interopRequireDefault(_to);
 
+require('utilise');
+
 /* istanbul ignore next */
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -45,14 +51,19 @@ function data(ripple) {
     },
     parse: function parse(res) {
       var existing = ripple.resources[res.name] || {};
-      delete res.headers.listeners;
-      (0, _extend2.default)(res.headers)(existing.headers);
 
       !res.body && (res.body = []);
       !res.body.on && (res.body = (0, _emitterify2.default)(res.body, -1));
-      res.body.on.change = res.headers.listeners = res.headers.listeners || [];
+
+      (0, _extend2.default)(res.headers)(existing.headers);
+      (0, _overwrite2.default)(res.body.on)(existing.body && existing.body.on || {});
+      console.log('ex', keys(existing.body && existing.body.on || {}));
+      console.log('res', keys(res.body.on));
       res.body.on('change.bubble', function (change) {
         return ripple.emit('change', [res.name, change], (0, _not2.default)(_is2.default.in(['data'])));
+      });
+      res.body.on('log', function (change) {
+        return res.body.emit('change', change);
       });
 
       return res;
