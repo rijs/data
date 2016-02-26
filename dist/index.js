@@ -55,7 +55,7 @@ function data(ripple) {
       var existing = ripple.resources[res.name] || {};
 
       !res.body && (res.body = []);
-      !res.body.on && (res.body = (0, _emitterify2.default)(res.body, -1));
+      !res.body.on && (res.body = (0, _emitterify2.default)(res.body, null));
 
       (0, _extend2.default)(res.headers)(existing.headers);
       (0, _overwrite2.default)(res.body.on)(existing.body && existing.body.on || {});
@@ -64,7 +64,7 @@ function data(ripple) {
       res.body.on('change.bubble', function (change) {
         return ripple.emit('change', [res.name, change], (0, _not2.default)(_is2.default.in(['data'])));
       });
-      res.body.on('log', function (change) {
+      res.body.on('log.bubble', function (change) {
         return res.body.emit('change', change);
       });
 
@@ -77,7 +77,7 @@ function data(ripple) {
 
 var trickle = function trickle(ripple) {
   return function (name, change) {
-    return (0, _header2.default)('content-type', 'application/data')(ripple.resources[name]) && ripple.resources[name].body.emit('change', [change || -1], (0, _not2.default)(_is2.default.in(['bubble'])));
+    return (0, _header2.default)('content-type', 'application/data')(ripple.resources[name]) && ripple.resources[name].body.emit('change', [change || null], (0, _not2.default)(_is2.default.in(['bubble'])));
   };
 };
 

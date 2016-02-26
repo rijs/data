@@ -11,14 +11,14 @@ export default function data(ripple){
       const existing = ripple.resources[res.name] || {}
 
       !res.body    && (res.body = [])
-      !res.body.on && (res.body = emitterify(res.body, -1))
+      !res.body.on && (res.body = emitterify(res.body, null))
 
       extend(res.headers)(existing.headers)
       overwrite(res.body.on)(existing.body && existing.body.on || {})
       if (logged(existing)) res.body.log = existing.body.log.reset(res.body)
 
       res.body.on('change.bubble', change => ripple.emit('change', [res.name, change], not(is.in(['data']))))
-      res.body.on('log', change => res.body.emit('change', change))
+      res.body.on('log.bubble', change => res.body.emit('change', change))
 
       return res
     }
@@ -31,7 +31,7 @@ const trickle = ripple => (name, change) => header('content-type', 'application/
   && ripple
       .resources[name]
       .body
-      .emit('change', [change || -1], not(is.in(['bubble'])))
+      .emit('change', [change || null], not(is.in(['bubble'])))
 
 import emitterify from 'utilise/emitterify'
 import overwrite from 'utilise/overwrite'

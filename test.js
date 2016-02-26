@@ -2,6 +2,7 @@ var versioned = require('versioned').default
   , expect = require('chai').expect
   , core = require('rijs.core').default
   , update = require('utilise/update')
+  , clone = require('utilise/clone')
   , data = require('./').default
   , key = require('utilise/key')
   , to = require('utilise/to')
@@ -34,7 +35,7 @@ describe('Data Type', function() {
     ripple('foo').on('change', fn)
 
     ripple('foo').emit('change')
-    expect(result).to.eql([-1])
+    expect(result).to.eql([null])
 
     ripple('foo').emit('change', { change: 'yep' })
     expect(result).to.eql([{ change: 'yep' }])
@@ -49,7 +50,7 @@ describe('Data Type', function() {
     ripple.on('change', fn)
 
     ripple('foo').emit('change')
-    expect(result).to.eql(['foo', -1])
+    expect(result).to.eql(['foo', null])
 
     ripple('foo').emit('change', { change: 'yep' })
     expect(result).to.eql(['foo', { change: 'yep' }])
@@ -63,13 +64,13 @@ describe('Data Type', function() {
     ripple('foo').on('change', fn)
 
     ripple.emit('change', 'foo')
-    expect(result).to.eql([-1])
+    expect(result).to.eql([null])
 
     ripple.emit('change', ['foo'])
-    expect(result).to.eql([-1])
+    expect(result).to.eql([null])
 
     ripple.emit('change', ['foo', false])
-    expect(result).to.eql([-1])
+    expect(result).to.eql([null])
 
     ripple.emit('change', ['foo', { change: 'yep' }])
     expect(result).to.eql([{ change: 'yep' }])
@@ -123,7 +124,10 @@ describe('Data Type', function() {
 
   it('should not lose log and update it on overwrite', function(){
     var ripple = data(core())
-      
+      , changes = []
+
+    ripple.on('change', function(d, change){ changes.push(clone(change)) })
+
     ripple('foo', versioned(['foo']))
     update(0, 'bar')(ripple('foo'))
     
@@ -149,6 +153,14 @@ describe('Data Type', function() {
 
     expect(ripple('foo').log[4].value.toJS()).to.eql(['wat'])
     expect(ripple('foo').log[4].diff).to.eql(undefined)
+
+    expect(changes).to.eql([ 
+      { type: 'update', value: ['foo'] }
+    , { type: 'update', value:  'bar', key: '0' }
+    , { type: 'update', value: ['baz'] }
+    , { type: 'update', value:  'boo', key: '0' }
+    , { type: 'update', value: ['wat'] }
+    ])
   })
 
 })
