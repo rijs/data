@@ -3,6 +3,7 @@ var versioned = require('versioned').default
   , core = require('rijs.core').default
   , update = require('utilise/update')
   , clone = require('utilise/clone')
+  , keys = require('utilise/keys')
   , data = require('./').default
   , key = require('utilise/key')
   , to = require('utilise/to')
@@ -134,9 +135,11 @@ describe('Data Type', function() {
     // should not need to explicity reinit version
     ripple('foo', ['baz'])
     update(0, 'boo')(ripple('foo'))
-    
+    expect(keys(ripple('foo'))).to.eql(['0'])
+
     // should work if new object versioned
     ripple('foo', versioned(['wat']))
+    expect(keys(ripple('foo'))).to.eql(['0'])
 
     expect(ripple('foo').log.length).to.eql(5)
     expect(ripple('foo').log[0].value.toJS()).to.eql(['foo'])

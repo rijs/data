@@ -25,6 +25,10 @@ var _not = require('utilise/not');
 
 var _not2 = _interopRequireDefault(_not);
 
+var _def = require('utilise/def');
+
+var _def2 = _interopRequireDefault(_def);
+
 var _key = require('utilise/key');
 
 var _key2 = _interopRequireDefault(_key);
@@ -59,7 +63,8 @@ function data(ripple) {
 
       (0, _extend2.default)(res.headers)(existing.headers);
       (0, _overwrite2.default)(res.body.on)(existing.body && existing.body.on || {});
-      if (logged(existing)) res.body.log = existing.body.log.reset(res.body);
+
+      if (logged(existing)) logged(res) ? res.body.log = existing.body.log.reset(res.body) : (0, _def2.default)(res.body, 'log', existing.body.log.reset(res.body), 1);
 
       res.body.on('change.bubble', function (change) {
         return ripple.emit('change', [res.name, change], (0, _not2.default)(_is2.default.in(['data'])));
