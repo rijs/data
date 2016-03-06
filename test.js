@@ -166,4 +166,11 @@ describe('Data Type', function() {
     ])
   })
 
+  it('should not lose existing headers', function(){
+    var ripple = data(core())
+    ripple('foo', { bar: 1 }, { foo: { bar: 5 } })
+    expect(ripple.resources.foo.headers.foo).to.eql({ bar: 5 })
+    ripple('foo', { bar: 2 })
+    expect(ripple.resources.foo.headers.foo).to.eql({ bar: 5 })
+  })
 })
