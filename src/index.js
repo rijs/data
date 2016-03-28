@@ -10,19 +10,11 @@ export default function data(ripple){
   , parse(res){ 
       const existing = ripple.resources[res.name] || {}
 
-      !res.body    && (res.body = [])
-      !res.body.on && (res.body = emitterify(res.body, null))
-
+      res.body = set()(res.body || [], existing.body && existing.body.log)
       extend(res.headers)(existing.headers)
-      overwrite(res.body.on)(existing.body && existing.body.on || {})
-      
-      if (logged(existing)) logged(res)
-        ? (res.body.log = existing.body.log.reset(res.body))
-        : def(res.body, 'log', existing.body.log.reset(res.body), 1)
-
+      overwrite(res.body.on)(listeners(existing))
       res.body.on('change.bubble', change => ripple.emit('change', [res.name, change], not(is.in(['data']))))
-      res.body.on('log.bubble', change => res.body.emit('change', change))
-
+      
       return res
     }
   }
@@ -36,14 +28,12 @@ const trickle = ripple => (name, change) => header('content-type', 'application/
       .body
       .emit('change', [change || null], not(is.in(['bubble'])))
 
-import emitterify from 'utilise/emitterify'
 import overwrite from 'utilise/overwrite'
 import header from 'utilise/header'
 import extend from 'utilise/extend'
 import not from 'utilise/not'
-import def from 'utilise/def'
 import key from 'utilise/key'
+import set from 'utilise/set'
 import is from 'utilise/is'
-import to from 'utilise/to'
 const log = require('utilise/log')('[ri/types/data]')
-    , logged = key('body.log')
+    , listeners = key('body.on')

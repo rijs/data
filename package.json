@@ -14,6 +14,7 @@
     "build": "npm run clean && npm run babel && npm run ignore",
     "test": "istanbul test ./node_modules/mocha/bin/_mocha --report html -- -R spec",
     "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && rm -rf ./coverage",
+    "cov": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec",
     "version": "npm run build && git add -A",
     "postversion": "git push && git push --tags"
   },
@@ -29,8 +30,7 @@
     "mocha-lcov-reporter": "*",
     "popper": "*",
     "rijs.core": "*",
-    "uglify-js": "*",
-    "versioned": "*"
+    "uglify-js": "*"
   },
   "dependencies": {
     "utilise": "*"

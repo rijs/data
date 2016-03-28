@@ -1,11 +1,11 @@
-var versioned = require('versioned').default
-  , expect = require('chai').expect
-  , core = require('rijs.core').default
+var core = require('rijs.core').default
   , update = require('utilise/update')
   , clone = require('utilise/clone')
+  , expect = require('chai').expect
   , keys = require('utilise/keys')
   , data = require('./').default
   , key = require('utilise/key')
+  , set = require('utilise/set')
   , to = require('utilise/to')
 
 describe('Data Type', function() {
@@ -129,41 +129,25 @@ describe('Data Type', function() {
 
     ripple.on('change', function(d, change){ changes.push(clone(change)) })
 
-    ripple('foo', versioned(['foo']))
+    ripple('foo', ['foo'])
     update(0, 'bar')(ripple('foo'))
-    
-    // should not need to explicity reinit version
-    ripple('foo', ['baz'])
+ 
+    ripple('foo', set()(['baz']))
     update(0, 'boo')(ripple('foo'))
-    expect(keys(ripple('foo'))).to.eql(['0'])
 
-    // should work if new object versioned
-    ripple('foo', versioned(['wat']))
-    expect(keys(ripple('foo'))).to.eql(['0'])
+    expect(ripple('foo').log)
+      .to.eql(changes)
+      .to.eql([ 
+        { time: 0, type: 'update', value: ['foo'] }
+      , { time: 1, type: 'update', value:  'bar', key: '0' }
+      , { time: 2, type: 'update', value: ['baz'] }
+      , { time: 3, type: 'update', value:  'boo', key: '0' } 
+      ])
 
-    expect(ripple('foo').log.length).to.eql(5)
-    expect(ripple('foo').log[0].value.toJS()).to.eql(['foo'])
-    expect(ripple('foo').log[0].diff).to.eql(undefined)
-    
-    expect(ripple('foo').log[1].value.toJS()).to.eql(['bar'])
-    expect(ripple('foo').log[1].diff).to.eql({ key: '0', value: 'bar', type: 'update' })
-    
-    expect(ripple('foo').log[2].value.toJS()).to.eql(['baz'])
-    expect(ripple('foo').log[2].diff).to.eql(undefined)
-
-    expect(ripple('foo').log[3].value.toJS()).to.eql(['boo'])
-    expect(ripple('foo').log[3].diff).to.eql({ key: '0', value: 'boo', type: 'update' })
-
-    expect(ripple('foo').log[4].value.toJS()).to.eql(['wat'])
-    expect(ripple('foo').log[4].diff).to.eql(undefined)
-
-    expect(changes).to.eql([ 
-      { type: 'update', value: ['foo'] }
-    , { type: 'update', value:  'bar', key: '0' }
-    , { type: 'update', value: ['baz'] }
-    , { type: 'update', value:  'boo', key: '0' }
-    , { type: 'update', value: ['wat'] }
-    ])
+    ripple('bar', ripple('foo'))
+    expect(ripple('foo')).to.not.equal(ripple('bar'))
+    expect(ripple('foo').log).to.have.lengthOf(4)
+    expect(ripple('bar').log).to.have.lengthOf(5)
   })
 
   it('should not lose existing headers', function(){
