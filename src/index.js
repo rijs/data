@@ -10,8 +10,12 @@ export default function data(ripple){
   , parse(res){ 
       const existing = ripple.resources[res.name] || {}
 
-      res.body = set()(res.body || [], existing.body && existing.body.log)
       extend(res.headers)(existing.headers)
+      res.body = set()(
+        res.body || []
+      , existing.body && existing.body.log
+      , is.num(res.headers.log) ? res.headers.log : -1
+      )
       overwrite(res.body.on)(listeners(existing))
       res.body.on('change.bubble', change => ripple.emit('change', [res.name, change], not(is.in(['data']))))
       

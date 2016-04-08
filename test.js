@@ -132,22 +132,17 @@ describe('Data Type', function() {
     ripple('foo', ['foo'])
     update(0, 'bar')(ripple('foo'))
  
-    ripple('foo', set()(['baz']))
+    ripple('foo', ['baz'])
     update(0, 'boo')(ripple('foo'))
 
-    expect(ripple('foo').log)
-      .to.eql(changes)
-      .to.eql([ 
-        { time: 0, type: 'update', value: ['foo'] }
-      , { time: 1, type: 'update', value:  'bar', key: '0' }
-      , { time: 2, type: 'update', value: ['baz'] }
-      , { time: 3, type: 'update', value:  'boo', key: '0' } 
-      ])
+    expect(changes).to.eql([ 
+      { time: 0, type: 'update', value: ['foo'] }
+    , { time: 1, type: 'update', value:  'bar', key: '0' }
+    , { time: 2, type: 'update', value: ['baz'] }
+    , { time: 3, type: 'update', value:  'boo', key: '0' } 
+    ])
 
-    ripple('bar', ripple('foo'))
-    expect(ripple('foo')).to.not.equal(ripple('bar'))
-    expect(ripple('foo').log).to.have.lengthOf(4)
-    expect(ripple('bar').log).to.have.lengthOf(5)
+    expect(ripple('foo').log).to.eql([null, null, null, null])
   })
 
   it('should not lose existing headers', function(){
