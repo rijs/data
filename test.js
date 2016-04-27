@@ -2,6 +2,7 @@ var core = require('rijs.core').default
   , update = require('utilise/update')
   , clone = require('utilise/clone')
   , expect = require('chai').expect
+  , time = require('utilise/time')
   , keys = require('utilise/keys')
   , data = require('./').default
   , key = require('utilise/key')
@@ -151,5 +152,24 @@ describe('Data Type', function() {
     expect(ripple.resources.foo.headers.foo).to.eql({ bar: 5 })
     ripple('foo', { bar: 2 })
     expect(ripple.resources.foo.headers.foo).to.eql({ bar: 5 })
+  })
+
+  it('should make active change accessible', function(done){
+    var ripple = data(core())
+      , result
+
+    ripple('foo', { bar: 5 })
+    ripple.on('change', function(data){
+      result = ripple.change
+    })
+      
+    expect(ripple.change).to.be.not.ok
+    update('bar', 15)(ripple('foo'))
+    expect(ripple.change).to.be.not.ok
+
+    time(10, function(){
+      expect(result).to.eql(['foo', { type: 'update', key: 'bar', value: 15, time: 1 }])
+      done()
+    })
   })
 })

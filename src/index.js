@@ -17,7 +17,10 @@ export default function data(ripple){
       , is.num(res.headers.log) ? res.headers.log : -1
       )
       overwrite(res.body.on)(listeners(existing))
-      res.body.on('change.bubble', change => ripple.emit('change', [res.name, change], not(is.in(['data']))))
+      res.body.on('change.bubble', change => {
+        ripple.emit('change', ripple.change = [res.name, change], not(is.in(['data'])))
+        delete ripple.change
+      })
       
       return res
     }
