@@ -54,9 +54,7 @@ function data(ripple) {
       res.body = (0, _set2.default)()(res.body || [], existing.body && existing.body.log, _is2.default.num(res.headers.log) ? res.headers.log : -1);
       (0, _overwrite2.default)(res.body.on)(listeners(existing));
       res.body.on('change.bubble', function (change) {
-        console.log("before", ripple.change);
         ripple.emit('change', ripple.change = [res.name, change], (0, _not2.default)(_is2.default.in(['data'])));
-        console.log("here", ripple.change);
         delete ripple.change;
       });
 
