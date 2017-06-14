@@ -32,12 +32,12 @@ describe('Data Type', function() {
   it('should emit local change events', function(){
     var ripple = data(core())
       , fn = function(){ result = to.arr(arguments) }
-      , result 
+      , result
 
     ripple('foo').on('change', fn)
 
     ripple('foo').emit('change')
-    expect(result).to.eql([null])
+    expect(result).to.eql([undefined])
 
     ripple('foo').emit('change', { change: 'yep' })
     expect(result).to.eql([{ change: 'yep' }])
@@ -52,7 +52,7 @@ describe('Data Type', function() {
     ripple.on('change', fn)
 
     ripple('foo').emit('change')
-    expect(result).to.eql(['foo', null])
+    expect(result).to.eql(['foo', undefined])
 
     ripple('foo').emit('change', { change: 'yep' })
     expect(result).to.eql(['foo', { change: 'yep' }])
@@ -84,8 +84,8 @@ describe('Data Type', function() {
     ripple('foo', [1])
     ripple('foo', [2])
     
-    expect(ripple.resources.foo.body.on.change.length).to.equal(0)
-    expect(ripple.resources.foo.body.on.change.bubble).to.be.a('function')
+    expect(ripple.resources.foo.body.on.change.length).to.equal(1)
+    expect(ripple.resources.foo.body.on.change.$bubble).to.be.a('function')
   })
 
   it('should not destroy existing headers by default', function(){
@@ -115,13 +115,13 @@ describe('Data Type', function() {
 
     ripple('foo', ['bar'])
 
-    expect(ripple('foo').on('change')[0]).to.eql(String)
-    expect(ripple('foo').on('change').length).to.eql(1)
-    expect(ripple('foo').on('change.foo')).to.eql(Date)
+    expect(ripple('foo').on.change[0]).to.eql(String)
+    expect(ripple('foo').on.change.length).to.eql(3)
+    expect(ripple('foo').on.change.$foo).to.eql(Date)
     
-    expect(ripple('foo').on('foo')[0]).to.eql(Function)
-    expect(ripple('foo').on('foo').length).to.eql(1)
-    expect(ripple('foo').on('foo.bar')).to.eql(Boolean)
+    expect(ripple('foo').on.foo[0]).to.eql(Function)
+    expect(ripple('foo').on.foo.length).to.eql(2)
+    expect(ripple('foo').on.foo.$bar).to.eql(Boolean)
   })
 
   it('should not lose log and update it on overwrite', function(){
