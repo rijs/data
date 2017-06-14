@@ -7,7 +7,9 @@ export default function data(ripple){
   ripple.types['application/data'] = {
     header: 'application/data'
   , check(res){ return is.obj(res.body) || !res.body ? true : false }
+  , to: res => (is.fn(res.value) && (res.value = str(res.value)), res)
   , parse(res){ 
+      if (is.str(res.body)) res.body = fn(res.body)
       const existing = ripple.resources[res.name] || {}
 
       extend(res.headers)(existing.headers)

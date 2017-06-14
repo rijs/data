@@ -23,6 +23,13 @@ describe('Data Type', function() {
     expect(ripple('foo')).to.eql([])
   })
 
+  it('should create data resource if body function', function(){  
+    var ripple = data(core())
+      , fn = d => 'foo'
+    ripple('foo', fn, { 'content-type': 'application/data' })
+    expect(ripple('foo')).to.eql(fn)
+  })
+
   it('should not create data resource', function(){  
     var ripple = data(core())
     ripple('baz', String)
