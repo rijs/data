@@ -17,10 +17,10 @@ describe('Data Type', function() {
     expect(ripple('foo')).to.eql({ foo: 'bar' })
   })
 
-  it('should create data resource if no body', function(){  
+  it('should not automatically create data resource if no body', function(){  
     var ripple = data(core())
-    ripple('foo')
-    expect(ripple('foo')).to.eql([])
+    expect(ripple('foo')).to.be.not.ok
+    expect(ripple.resources.foo).to.not.be.ok
   })
 
   it('should create data resource if body function', function(){  
@@ -41,7 +41,7 @@ describe('Data Type', function() {
       , fn = function(){ result = to.arr(arguments) }
       , result
 
-    ripple('foo').on('change', fn)
+    ripple('foo', {}).on('change', fn)
 
     ripple('foo').emit('change')
     expect(result).to.eql([undefined])
@@ -55,7 +55,7 @@ describe('Data Type', function() {
       , fn = function(){ result = to.arr(arguments) }
       , result 
 
-    ripple('foo')
+    ripple('foo', {})
     ripple.on('change', fn)
 
     ripple('foo').emit('change')
@@ -70,7 +70,7 @@ describe('Data Type', function() {
       , fn = function(){ result = to.arr(arguments) }
       , result 
 
-    ripple('foo').on('change', fn)
+    ripple('foo', {}).on('change', fn)
 
     ripple.emit('change', 'foo')
     expect(result).to.eql([null])
