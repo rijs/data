@@ -43,6 +43,7 @@ import extend from 'utilise/extend'
 import not from 'utilise/not'
 import key from 'utilise/key'
 import set from 'utilise/set'
+import fn from 'utilise/fn'
 import is from 'utilise/is'
 const log = require('utilise/log')('[ri/types/data]')
     , listeners = key('body.on')
