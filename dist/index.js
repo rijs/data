@@ -29,6 +29,10 @@ var _set = require('utilise/set');
 
 var _set2 = _interopRequireDefault(_set);
 
+var _fn = require('utilise/fn');
+
+var _fn2 = _interopRequireDefault(_fn);
+
 var _is = require('utilise/is');
 
 var _is2 = _interopRequireDefault(_is);
@@ -45,13 +49,13 @@ function data(ripple) {
   ripple.types['application/data'] = {
     header: 'application/data',
     check: function check(res) {
-      return _is2.default.obj(res.body) || !res.body ? true : false;
+      return _is2.default.obj(res.body) ? true : false;
     },
     to: function to(res) {
       return _is2.default.fn(res.value) && (res.value = str(res.value)), res;
     },
     parse: function parse(res) {
-      if (_is2.default.str(res.body)) res.body = fn(res.body);
+      if (_is2.default.str(res.body)) res.body = (0, _fn2.default)(res.body);
       var existing = ripple.resources[res.name] || {};
 
       (0, _extend2.default)(res.headers)(existing.headers);
