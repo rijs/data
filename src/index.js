@@ -1,7 +1,7 @@
 // -------------------------------------------
 // Adds support for data resources
 // -------------------------------------------
-export default function data(ripple){
+module.exports = function data(ripple){
   log('creating')
   ripple.on('change.data', trickle(ripple))
   ripple.types['application/data'] = {
@@ -37,13 +37,13 @@ const trickle = ripple => (name, change) => header('content-type', 'application/
       .body
       .emit('change', [change || null], not(is.in(['bubble'])))
 
-import overwrite from 'utilise/overwrite'
-import header from 'utilise/header'
-import extend from 'utilise/extend'
-import not from 'utilise/not'
-import key from 'utilise/key'
-import set from 'utilise/set'
-import fn from 'utilise/fn'
-import is from 'utilise/is'
-const log = require('utilise/log')('[ri/types/data]')
+const overwrite = require('utilise/overwrite')
+    , header = require('utilise/header')
+    , extend = require('utilise/extend')
+    , not = require('utilise/not')
+    , key = require('utilise/key')
+    , set = require('utilise/set')
+    , fn = require('utilise/fn')
+    , is = require('utilise/is')
+    , log = require('utilise/log')('[ri/types/data]')
     , listeners = key('body.on')
