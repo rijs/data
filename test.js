@@ -1,10 +1,10 @@
-var core = require('rijs.core').default
+var core = require('rijs.core')
   , update = require('utilise/update')
   , clone = require('utilise/clone')
   , expect = require('chai').expect
   , time = require('utilise/time')
   , keys = require('utilise/keys')
-  , data = require('./').default
+  , data = require('./')
   , key = require('utilise/key')
   , set = require('utilise/set')
   , to = require('utilise/to')
@@ -73,16 +73,16 @@ describe('Data Type', function() {
     ripple('foo', {}).on('change', fn)
 
     ripple.emit('change', 'foo')
-    expect(result).to.eql([null])
+    expect(result).to.be.not.ok
 
     ripple.emit('change', ['foo'])
-    expect(result).to.eql([null])
+    expect(result).to.be.not.ok
 
     ripple.emit('change', ['foo', false])
-    expect(result).to.eql([null])
+    expect(result).to.be.not.ok
 
-    ripple.emit('change', ['foo', { change: 'yep' }])
-    expect(result).to.eql([{ change: 'yep' }])
+    ripple.emit('change', ['foo', { key: 'yep' }])
+    expect(result).to.eql([{ key: 'yep' }])
   })
 
   it('should not duplicate listeners', function(){
