@@ -14,11 +14,19 @@ module.exports = function data(ripple){
 
   ripple.types['application/data'] = {
     header: 'application/data'
+  , ext: '*.data.js'
   , selector: res => `[data~="${res.name}"]`
   , extract: el => (attr(`data`)(el) || '').split(' ')
-  , check: res => is.obj(res.body) ? true : false
+  , check: res => is.obj(res.body)
+  , load(res) {
+      let exported = require(res.headers.path)
+      exported = exported.default || exported
+      exported = is.fn(exported) ? exported(ripple) : exported
+      res.headers['content-type'] = this.header
+      ripple(merge(res)(exported))
+      return ripple.resources[res.name]
+    }
   , parse(res){ 
-      if (is.str(res.body)) res.body = fn(res.body)
       const existing = ripple.resources[res.name] || {}
 
       extend(res.headers)(existing.headers)
@@ -32,7 +40,14 @@ module.exports = function data(ripple){
         ripple.emit('change', ripple.change = [res.name, change], not(is.in(['data'])))
         delete ripple.change
       })
-      
+
+      if (res.headers.loaded && !res.headers.loading)
+        res.headers.loading = Promise.resolve(res.headers.loaded(ripple, res))
+          .then(() => { 
+            delete res.headers.loading
+            return res
+          })
+
       return res
     }
   }
@@ -43,6 +58,7 @@ module.exports = function data(ripple){
 const overwrite = require('utilise/overwrite')
     , header = require('utilise/header')
     , extend = require('utilise/extend')
+    , merge = require('utilise/merge')
     , attr = require('utilise/attr')
     , not = require('utilise/not')
     , key = require('utilise/key')
