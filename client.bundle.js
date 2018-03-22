@@ -1,5 +1,13 @@
-var data = (function () {
+var data = (function (merge) {
 'use strict';
+
+merge = merge && merge.hasOwnProperty('default') ? merge['default'] : merge;
+
+var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+function commonjsRequire () {
+	throw new Error('Dynamic requires are not currently supported by rollup-plugin-commonjs');
+}
 
 var is_1 = is;
 is.fn      = isFunction;
@@ -438,11 +446,6 @@ function remove(o, k, v) {
     : delete o[k];
 }
 
-var fn = function fn(candid){
-  return is_1.fn(candid) ? candid
-       : (new Function("return " + candid))()
-};
-
 var to = { 
   arr: toArray
 , obj: toObject
@@ -465,8 +468,6 @@ function toObject(d) {
     return p
   }
 }
-
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 var client = typeof window != 'undefined';
 
@@ -512,11 +513,19 @@ var data = function data(ripple){
 
   ripple.types['application/data'] = {
     header: 'application/data'
+  , ext: '*.data.js'
   , selector: function (res) { return ("[data~=\"" + (res.name) + "\"]"); }
   , extract: function (el) { return (attr("data")(el) || '').split(' '); }
-  , check: function (res) { return is_1.obj(res.body) ? true : false; }
+  , check: function (res) { return is_1.obj(res.body); }
+  , load: function load(res) {
+      var exported = commonjsRequire(res.headers.path);
+      exported = exported.default || exported;
+      exported = is_1.fn(exported) ? exported(ripple) : exported;
+      res.headers['content-type'] = this.header;
+      ripple(merge(res)(exported));
+      return ripple.resources[res.name]
+    }
   , parse: function parse(res){ 
-      if (is_1.str(res.body)) { res.body = fn(res.body); }
       var existing = ripple.resources[res.name] || {};
 
       extend(res.headers)(existing.headers);
@@ -530,7 +539,14 @@ var data = function data(ripple){
         ripple.emit('change', ripple.change = [res.name, change], not(is_1.in(['data'])));
         delete ripple.change;
       });
-      
+
+      if (res.headers.loaded && !res.headers.loading)
+        { res.headers.loading = Promise.resolve(res.headers.loaded(ripple, res))
+          .then(function () { 
+            delete res.headers.loading;
+            return res
+          }); }
+
       return res
     }
   };
@@ -543,4 +559,4 @@ var listeners = key('body.on');
 
 return data;
 
-}());
+}(merge));
